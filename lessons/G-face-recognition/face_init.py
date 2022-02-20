@@ -4,7 +4,9 @@ import argparse
 import imutils
 import time
 import cv2
-import RPi.GPIO as GPIO
+#import RPi.GPIO as GPIO
+
+#GPIO.setmode(GPIO.BOARD)
 
 ap = argparse.ArgumentParser()
 ap.add_argument("-p", "--prototxt", required=True,
@@ -19,14 +21,14 @@ print("[INFO] loading model...")
 net = cv2.dnn.readNetFromCaffe(args["prototxt"], args["model"])
 
 print("[INFO] starting video stream...")
-vs = VideoStream(usePiCamera=True).start()
+vs = VideoStream(src=0)
 time.sleep(2.0)
 
 while True:
     frame = vs.read()
     frame = imutils.resize(frame, width=400)
-    GPIO.output(3, GPIO.LOW)
-    GPIO.output(4, GPIO.HIGH)
+    #GPIO.output(3, GPIO.LOW)
+    #GPIO.output(4, GPIO.HIGH)
 
     (h, w) = frame.shape[:2]
     blob = cv2.dnn.blobFromImage(cv2.resize(frame, (300, 300)), 1.0,
@@ -40,8 +42,8 @@ while True:
         if confidence < args["confidence"]:
             continue
 
-        GPIO.output(3, GPIO.HIGH)
-        GPIO.output(4, GPIO.LOW)
+        #GPIO.output(3, GPIO.HIGH)
+        #GPIO.output(4, GPIO.LOW)
 
         box = detections[0, 0, i, 3:7] * np.array([w, h, w, h])
         (startX, startY, endX, endY) = box.astype("int")
